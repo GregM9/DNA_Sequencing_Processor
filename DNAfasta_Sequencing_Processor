@@ -1,0 +1,182 @@
+import time, tkinter.filedialog, os, random, xlsxwriter
+t0 = time.time()
+
+#readfile, readfile1, DNA_readfile, PROTEIN_readfile = open('1DNA_Sequencing_Input.txt', 'r'), open('2Reference_Protein_List.txt','r'), open('3DNA_output_file.txt','w'), open('4PROTEIN_output_file.txt','w'), open('5Diagnostics.txt','w')
+#DNA_read, Protein_read = readfile.read(), readfile1.read()
+codon_table = {'TNA': 'X', 'NGG': 'X', 'NCC': 'X', 'CCN': 'X', 'GCA': 'A', 'TCG': 'S', 'CTT': 'L', 'TCA': 'S','CNT': 'X', 'GGT': 'G', 'GAN': 'X', 'ATN': 'X', 'TTT': 'F', 'CNA': 'X', 'NNC': 'X', 'TAC': 'Y', 'AAA': 'K', 'NAC': 'X', 'GAG': 'E', 'GGG': 'G', 'GTN': 'X', 'CNC': 'X', 'NAG': 'X', 'NTT': 'X', 'ANC': 'X', 'ATA': 'I', 'CGN': 'X', 'TNG': 'X', 'GNT': 'X', 'TGC': 'C', 'TTN': 'X', 'AGC': 'S', 'TTA': 'L', 'NGN': 'X', 'CTN': 'X', 'NAN': 'X', 'TCC': 'S', 'CCA': 'P', 'NAA': 'X', 'GCN': 'X', 'TNN': 'X', 'GNA': 'X', 'TAT': 'Y', 'CNN': 'X', 'CTG': 'L', 'NCA': 'X', 'GTG': 'V', 'NNN': 'X', 'TAN': 'X', 'GGN': 'X', 'GCG': 'A', 'NCG': 'X', 'TCN': 'X', 'CAT': 'H', 'GAT': 'D', 'CGT': 'R', 'CCC': 'P', 'AGT': 'S', 'ATC': 'I', 'GAC': 'D', 'NTC': 'X', 'CNG': 'X', 'GAA': 'E', 'ACN': 'X', 'NGA': 'X', 'CTA': 'L', 'AGA': 'R', 'ACC': 'T', 'TAG': '*', 'NCT': 'X', 'GTC': 'V', 'GGA': 'G', 'GCC': 'A', 'CGA': 'R', 'ATT': 'I', 'CAC': 'H', 'CCG': 'P', 'AGN': 'X', 'TTG': 'L', 'AAN': 'X', 'ANN': 'X', 'CCT': 'P', 'TAA': '*', 'TNT': 'X', 'ACT': 'T', 'ACA': 'T', 'TGN': 'X', 'ANG': 'X', 'CGC': 'R', 'CAN': 'X', 'NTA': 'X', 'GTT': 'V', 'GNN': 'X', 'GGC': 'G', 'TGA': '*', 'NCN': 'X', 'AAT': 'N', 'TTC': 'F', 'NTN': 'X', 'GTA': 'V', 'GNC': 'X', 'NNT': 'X', 'NGC': 'X', 'TGG': 'W', 'ATG': 'M', 'NAT': 'X', 'TNC': 'X', 'ACG': 'T', 'NGT': 'X', 'TCT': 'S', 'NNG': 'X', 'AAC': 'N', 'ANA': 'X', 'AGG': 'R', 'TGT': 'C', 'ANT': 'X', 'GNG': 'X', 'CTC': 'L', 'NTG': 'X', 'CGG': 'R', 'NNA': 'X', 'AAG': 'K', 'GCT': 'A', 'CAA': 'Q', 'CAG': 'Q','NC': 'x', 'KY': 'x', 'GN': 'x', 'VT': 'x', 'SG': 'x', 'AB': 'x', 'CY': 'x', 'KM': 'x', 'TA': 'x', 'SY': 'x', 'KC': 'x', 'CC': 'x', 'WA': 'x', 'VA': 'x', 'BC': 'x', 'RY': 'x', 'AC': 'x', 'DS': 'x', 'TK': 'x', 'TH': 'x', 'RD': 'x', 'NB': 'x', 'VG': 'x', 'AY': 'x', 'CA': 'x', 'WG': 'x', 'VN': 'x', 'AV': 'x', 'CT': 'x', 'TN': 'x', 'KN': 'x', 'BY': 'x', 'HS': 'x', 'CW': 'x', 'MM': 'x', 'SW': 'x', 'BK': 'x', 'DC': 'x', 'GT': 'x', 'CD': 'x', 'RB': 'x', 'YN': 'x', 'KK': 'x', 'AT': 'x', 'HV': 'x', 'HT': 'x', 'MY': 'x', 'HA': 'x', 'KH': 'x', 'MD': 'x', 'KB': 'x', 'BV': 'x', 'CV': 'x', 'DK': 'x', 'GS': 'x', 'DA': 'x', 'WV': 'x', 'VV': 'x', 'AH': 'x', 'YG': 'x', 'AM': 'x', 'RK': 'x', 'SM': 'x', 'GY': 'x', 'TG': 'x', 'WC': 'x', 'GB': 'x', 'CS': 'x', 'BH': 'x', 'MA': 'x', 'BG': 'x', 'VS': 'x', 'BT': 'x', 'TD': 'x', 'WK': 'x', 'AS': 'x', 'MC': 'x', 'CN': 'x', 'YS': 'x', 'NW': 'x', 'MB': 'x', 'AN': 'x', 'NT': 'x', 'TS': 'x', 'YY': 'x', 'DG': 'x', 'HC': 'x', 'HY': 'x', 'RG': 'x', 'HG': 'x', 'CB': 'x', 'KR': 'x', 'KW': 'x', 'KT': 'x', 'YM': 'x', 'TM': 'x', 'WY': 'x', 'KG': 'x', 'GK': 'x', 'WS': 'x', 'MS': 'x', 'MW': 'x', 'WN': 'x', 'TC': 'x', 'NV': 'x', 'HB': 'x', 'YT': 'x', 'RM': 'x', 'VD': 'x', 'YR': 'x', 'YA': 'x', 'MV': 'x', 'NR': 'x', 'VM': 'x', 'BW': 'x', 'VR': 'x', 'TW': 'x', 'TB': 'x', 'RV': 'x', 'BS': 'x', 'VB': 'x', 'VW': 'x', 'DW': 'x', 'WW': 'x', 'AG': 'x', 'BR': 'x', 'TR': 'x', 'AA': 'x', 'DH': 'x', 'CM': 'x', 'SV': 'x', 'NN': 'x', 'GV': 'x', 'RN': 'x', 'CK': 'x', 'MG': 'x', 'NY': 'x', 'SA': 'x', 'VY': 'x', 'DR': 'x', 'SK': 'x', 'DV': 'x', 'TT': 'x', 'DY': 'x', 'MK': 'x', 'MR': 'x', 'MT': 'x', 'YK': 'x', 'BM': 'x', 'HK': 'x', 'WM': 'x', 'VC': 'x', 'GA': 'x', 'SR': 'x', 'HN': 'x', 'HD': 'x', 'AR': 'x', 'DM': 'x', 'NK': 'x', 'WH': 'x', 'MN': 'x', 'GM': 'x', 'GC': 'x', 'SN': 'x', 'MH': 'x', 'VH': 'x', 'HW': 'x', 'CR': 'x', 'NH': 'x', 'RC': 'x', 'TV': 'x', 'AW': 'x', 'YD': 'x', 'SH': 'x', 'GH': 'x', 'SD': 'x', 'NS': 'x', 'YH': 'x', 'DD': 'x', 'KS': 'x', 'BN': 'x', 'NG': 'x', 'RR': 'x', 'CG': 'x', 'SC': 'x', 'WB': 'x', 'ND': 'x', 'RW': 'x', 'VK': 'x', 'BB': 'x', 'YV': 'x', 'AK': 'x', 'HR': 'x', 'SS': 'x', 'KV': 'x', 'WT': 'x', 'NA': 'x', 'RS': 'x', 'YB': 'x', 'HH': 'x', 'GG': 'x', 'DN': 'x', 'KA': 'x', 'RT': 'x', 'KD': 'x', 'DT': 'x', 'BA': 'x', 'RH': 'x', 'NM': 'x', 'SB': 'x', 'AD': 'x', 'DB': 'x', 'HM': 'x', 'BD': 'x', 'GD': 'x', 'RA': 'x', 'GW': 'x', 'ST': 'x', 'WD': 'x', 'TY': 'x', 'CH': 'x', 'YC': 'x', 'GR': 'x', 'WR': 'x', 'YW': 'x','A': 'x', 'C': 'x', 'R': 'x', 'S': 'x', 'K': 'x', 'V': 'x', 'H': 'x', 'M': 'x', 'N': 'x', 'T': 'x', 'G': 'x', 'D': 'x', 'W': 'x', 'B': 'x', 'Y': 'x'}
+Recognition_Tags = ['DYKDDDDK']#['KLGDIEFIKVNK','AHIVNVDAYKPTK','HHHHHH','DYKDDDDK','MKKNIAFLLASMFV', 'GLNDIFEAQKIEWHE','TAADTATYFC']
+
+def File_Processing():
+    '''FileFolderOpen --> Open Every '.txt' File --> DNADict[Name] = DNA Sequence (concatenated)
+
+        Function using os.walk and tkinter.filedialog such that:
+        1) User can select a filefolder with DNA sequences in txt format (1 per txt document)
+        2) Program then opens all text files (ignoring others) in folder
+        3) Stores name in a dictionary by indexing '>' in sequence.
+
+       example input:
+       >Avi-SH2CondensedD.G.M_M13Forward_ABL1_WT_A3
+        TACGGGGTAAAAGCCAGTCCGTTTAGGTGTTTTCACGAGC...
+                        ....
+        example ouput:
+        >Avi-SH2CondensedD.G.M_M13Forward_ABL1_WT_A3: 'TACGGGGTAAAAGCCAGTCCGTTTAGGTGTTTTCACGAGC'
+
+    ***NOTE: if changing folders or computers need to change 'write_to_path' to new directory
+    '''
+    path = tkinter.filedialog.askdirectory()
+    DNADict, RefDict = {}, {}
+    for root, dirs, files in os.walk(path, topdown = False):
+        for name in files:
+            if '.txt' in name:
+                with open(str(os.path.join(root, name)),'r') as sequence:
+                    seq = ''
+                    for line in sequence:
+                        if '>' in line:
+                            name = line.replace('\n', '')
+                        else:
+                            seq = seq + str(line)
+                    DNADict[name] = seq.replace('\n', '').upper().replace('R','N').replace('Y','N').replace('S','N').replace('W','N').replace('K','N').replace('M','N').replace('B','N').replace('D','N').replace('H','N').replace('V','N')
+
+    #Opens and processes reference sequences into RefDict
+    with open(os.path.abspath('Reference_Proteins.txt'), 'r') as Ref:
+        ref = Ref.readlines()
+        for x in range(0,len(ref)-2,2):
+            if ref[x].strip() != '':
+                RefDict[ref[x].replace('\n','').strip()] = ref[x+1].replace('\n','').strip()
+            else:
+                None
+                
+    '''with open(os.path.abspath('Reference_Proteins.txt'), 'r') as Ref:
+        ref = Ref.read()
+        RefDict[ref[ref.index('>'''
+
+    return DNA_Sequence_Translation(DNADict, RefDict)
+
+def DNA_Sequence_Translation(DNADict, RefDict):
+    '''DNADict[Name] = DNA Sequence (concatenated) --- > DNADict[Name] = DNA Sequence (concatenated) + ProteinDict[Name] = Protein Translation (concatenated)
+
+        Takes in DNA nt information and translates into all 6 frames. Then uses feature recognition from a set of predefined tags
+        to select appropriate frame to report back to the user. Frame is also reported in the title.
+
+        example input:
+        >Avi-SH2CondensedD.G.M_M13Forward_ABL1_WT_A3: 'TACGGGGTAAAAGCCAGTCCGTTTAGGTGTTTTCACGAGC' 
+                        ....
+        example ouput:
+        >Avi-SH2CondensedD.G.M_M13Forward_ABL1_WT_A3_F1: 'YGG*K...'    
+    '''
+    ProteinDict = {}
+    for seq in DNADict:
+        reverse_complement = [DNADict[seq][::-1],DNADict[seq][::-1][1:],DNADict[seq][::-1][2:]]
+        aaMatrix = [''.join(codon_table[DNADict[seq][x:x+3]] for x in range(0,len(DNADict[seq]),3)),''.join(codon_table[DNADict[seq][x:x+3]] for x in range(1,len(DNADict[seq])-1,3)),''.join(codon_table[DNADict[seq][x:x+3]] for x in range(2,len(DNADict[seq])-2,3)),
+                    ''.join(codon_table[reverse_complement[0][x:x+3]] for x in range(0,len(DNADict[seq]),3)),''.join(codon_table[reverse_complement[1][x:x+3]] for x in range(1,len(DNADict[seq])-1,3)),''.join(codon_table[reverse_complement[2][x:x+3]] for x in range(2,len(DNADict[seq])-2,3))]
+        for line in Recognition_Tags:
+            if line in aaMatrix[0]:
+                ProteinDict[seq] = [DNADict[seq], 'Frame 1', Protein_Identifier(aaMatrix[0], RefDict), aaMatrix[0]]
+                break
+            elif line in aaMatrix[1]:
+                ProteinDict[seq] = [DNADict[seq], 'Frame 2', Protein_Identifier(aaMatrix[1], RefDict), aaMatrix[1]]
+                break
+            elif line in aaMatrix[2]:
+                ProteinDict[seq] = [DNADict[seq], 'Frame 3', Protein_Identifier(aaMatrix[2], RefDict), aaMatrix[2]]
+                break
+            elif line in aaMatrix[3]:
+                ProteinDict[seq] = [DNADict[seq], 'Reverse 1', Protein_Identifier(aaMatrix[3], RefDict), aaMatrix[3]]
+                break
+            elif line in aaMatrix[4]:
+                ProteinDict[seq] = [DNADict[seq], 'Reverse 2', Protein_Identifier(aaMatrix[4], RefDict), aaMatrix[4]]
+                break
+            elif line in aaMatrix[5]:
+                ProteinDict[seq] = [DNADict[seq], 'Reverse 3', Protein_Identifier(aaMatrix[5], RefDict), aaMatrix[5]]
+                break
+            if line == Recognition_Tags[-1]:
+                ProteinDict[seq] = [DNADict[seq], 'N/A', Protein_Identifier(aaMatrix[0], RefDict), 'No in frame sequence found']
+
+    return Data_Parsing_Function(RefDict, ProteinDict)
+
+def Sequence_Input_Processor():
+    '''
+    '''
+    return None
+
+def Protein_Identifier(sequence, RefDict):
+    '''ProteinDict[Name] = AAseq --> ProteinDict[Name + ReferenceID] = AAseq
+
+    Function queries list of amino acid translations against a list of known proteins and adds the identification
+    to the name held in the library.
+
+    example input:
+    >Avi-SH2CondensedD.G.M_M13Forward_ABL1_WT_A3_F1: 'YGG*K...'
+
+    example ouput:
+    >Avi-SH2CondensedD.G.M_M13Forward_ABL1_WT_A3_F1 Predicted Sequence: 'Src_Wt_SH2Domain: 'YGG*K...'
+    '''
+    for line in RefDict:
+        if RefDict[line] in sequence:
+            return line
+            break  
+        elif line == RefDict[list(RefDict.keys())[-1]]:
+            return Sub_Sequence_Identifier(sequence, RefDict)
+
+    def Sub_Sequence_Identifier(sequence, RefDict):
+        '''Amino Acid Sequence --> Match from RefDict
+
+            If Protein_Identifier fails to match a sequence perfectly sub-function Sub_Sequnece_Identifier is triggered. Takes three random 8 amino acid frames from RefDict sequences and searches
+            query sequence. If a match is found then sequence is returned with asterisks (***) to denote a partial match.
+
+            example input:
+            >Query:
+            MKIEEHHHHHHSSGKLGLNDIFEAQKIEWHESSGEDLYFQSGTTMDDYKDDDDKGGSSPSNYITPVNSLEKHSWYHGPVSRNAAEYLLSSGINGSFLVRESESSPGQRSISLRYEGRVYH....
+            
+            example ouput:
+            '***Src_Wt_SH2Domain'
+        '''
+        k = 7
+        for char in RefDict:
+            random = [random.randint(0,len(char)- k), random.randint(0,len(char)- k), random.randint(0,len(char)- k)]
+            if RefDict[char][random[0]:random[0]+k] in sequence:
+                return '***' + char
+                break
+            elif RefDict[char][random[1]:random[0]+k] in sequence:
+                return '***' + char
+                break
+            elif RefDict[char][random[2]:random[0]+k] in sequence:
+                return '***' + char
+                break
+            else:
+                None
+
+def Data_Parsing_Function(RefDict, ProteinDict):
+    '''
+    '''
+    #Work on Excel Spreadsheet organizer
+    workbook = xlsxwriter.Workbook('Sequencing_Output.xlsx')
+    Output, titles = workbook.add_worksheet('Sequencing Data'), ['Sequence ID', 'DNA Sequence', 'Frame', 'Predicted Sequence','Protein Sequence']
+    #bold = Output.add_format({'bold': True}) -->works to set
+    for x in range(0,len(titles)):
+        Output.write(0,x,titles[x])
+    row = 1
+    for line in ProteinDict:
+        col = 0
+        Output.write(row,col,line)
+        for y in range(0,len(ProteinDict[line])):
+            col = col + 1
+            Output.write(row,col,ProteinDict[line][y])
+        row = row + 1
+        
+    workbook.close()
+
+    with open('CSV_Output.txt', 'w') as csv_out:
+        csv_out.write('Sequence ID,DNA Sequence,Frame,Predicted Sequence,Protein Sequence \n')
+        for line in ProteinDict:
+            csv_out.write(line + ',' + ProteinDict[line][0] + ',' + ProteinDict[line][1] + ',' + ProteinDict[line][2] + ',' + ProteinDict[line][3] + '\n')
+    csv_out.close()
+
+    with open('Tab_Output.txt', 'w') as tab_out:
+        tab_out.write('Sequence ID \t DNA Sequence \t Frame \t Predicted Sequence \t Protein Sequence \n')
+        for line in ProteinDict:
+            tab_out.write(line + '\t' + ProteinDict[line][0] + '\t' + ProteinDict[line][1] + '\t' + ProteinDict[line][2] + '\t' + ProteinDict[line][3] + '\n')
+    tab_out.close()
+
+    return None
+
+File_Processing()
